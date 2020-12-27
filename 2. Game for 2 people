@@ -24,7 +24,7 @@ class TicTacToe:
         self.O_number = 0
         print(TicTacToe.grid_printing(self))
         self.gamer_move = []
-        TicTacToe.player_X_move(self)
+        TicTacToe.player_x_move(self)
 
     def game(self):
         while True:
