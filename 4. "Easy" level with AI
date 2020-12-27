@@ -1,0 +1,173 @@
+import math
+import random
+
+
+class TicTacToe:
+    #print('Welcome to the tic-tac-toe game!\nPlayer X starts the game. Good luck!')
+
+    def __init__(self):
+        self.cells_value = '_________'
+        self.again = ' '
+        self.rows = []
+        self.matrix = ['11', '12', '13', '21', '22', '23', '31', '32', '33']
+        for x in self.cells_value:  # replaced with a space
+            if x == '_':
+                self.rows.append(' ')
+            else:
+                self.rows.append(x)
+        self.cells = {'11': self.rows[0], '12': self.rows[1], '13': self.rows[2],
+                      '21': self.rows[3], '22': self.rows[4], '23': self.rows[5],
+                      '31': self.rows[6], '32': self.rows[7], '33': self.rows[8]}
+        TicTacToe.grid_printing(self)
+        self.empty = [' ', '_']
+        self.win = 0
+        self.game_finished = 0
+        self.X_number = 0
+        self.O_number = 0
+        print(TicTacToe.grid_printing(self))
+        self.gamer_move = []
+        TicTacToe.player_x_move(self)
+        #TicTacToe.who_start(self)
+
+    # def who_start(self):
+        # self.X_number = self.rows.count('X')
+        # self.O_number = self.rows.count('O')
+        # if self.X_number > self.O_number:
+            # self.player = 'O'
+            # TicTacToe.player_o_move(self)
+        # if self.X_number < self.O_number:
+            # self.player = 'X'
+            # TicTacToe.player_x_move(self)
+        # else:
+            # self.player = 'X'
+            # TicTacToe.player_x_move(self)
+
+    def game(self):
+        while True:
+            self.gamer_move = input(f'Enter the coordinates: ')
+            self.gamer_move = [x for x in self.gamer_move]
+            delete = [' ', ',', ';']
+            letter = True
+            coordinate = True
+            for x in self.gamer_move:
+                if x in delete:
+                    self.gamer_move.remove(x)
+            for x in self.gamer_move:
+                if x.isalpha() is True:
+                    letter = False
+                elif 1 > int(x) or 3 < int(x):
+                    coordinate = False
+            if letter is False:
+                print('You should enter numbers!')
+            elif coordinate is False:
+                print('Coordinates should be from 1 to 3!')
+            else:
+                self.gamer_move = ''.join(self.gamer_move)  # change to str
+                cell_status = self.cells[self.gamer_move]
+                if cell_status == 'X' or cell_status == 'O':
+                    print('This cell is occupied! Choose another one!')
+                else:
+                    self.cells[self.gamer_move] = self.player
+                    print(TicTacToe.grid_printing(self))
+                    for x in self.matrix:
+                        if x == self.gamer_move:
+                            self.matrix.remove(x)
+                    return False
+
+    def ai_game(self):
+        while True:
+            computer_choice = random.choice(self.matrix)
+            cell_status = self.cells[computer_choice]
+            if cell_status == 'X' or cell_status == 'O':  # double check that the drawn cell is free
+                TicTacToe.ai_game(self)
+            else:
+                print('Making move level "easy"')
+                self.cells[computer_choice] = self.player
+                print(TicTacToe.grid_printing(self))
+                for x in self.matrix:
+                    if x == computer_choice:
+                        self.matrix.remove(x)
+                TicTacToe.player_x_move(self)
+                return False
+
+
+    def player_x_move(self):
+        self.player = 'X'
+        TicTacToe.is_game_finished(self)
+        while self.win == 0:
+            TicTacToe.game(self)
+            TicTacToe.player_o_move(self)
+
+    def player_o_move(self):
+        self.player = 'O'
+        TicTacToe.is_game_finished(self)
+        while self.win == 0:
+            TicTacToe.ai_game(self)
+
+    def grid_printing(self):
+        # print('---------')
+        # print(f'| {rows[0]} {rows[1]} {rows[2]} |')
+        # print(f'| {rows[3]} {rows[4]} {rows[5]} |')
+        # print(f'| {rows[6]} {rows[7]} {rows[8]} |')
+        # print('---------')
+        self.rows[0] = self.cells['11']
+        self.rows[1] = self.cells['12']
+        self.rows[2] = self.cells['13']
+        self.rows[3] = self.cells['21']
+        self.rows[4] = self.cells['22']
+        self.rows[5] = self.cells['23']
+        self.rows[6] = self.cells['31']
+        self.rows[7] = self.cells['32']
+        self.rows[8] = self.cells['33']
+        return f"---------\n| {self.cells['11']} {self.cells['12']} {self.cells['13']} |" \
+               f"\n| {self.cells['21']} {self.cells['22']} {self.cells['23']} |" \
+               f"\n| {self.cells['31']} {self.cells['32']} {self.cells['33']} |\n---------"
+
+    def is_game_finished(self):
+        if (self.empty[0] in self.rows) or (self.empty[1] in self.rows):
+            self.game_finished = 1  # there are empty cells
+            TicTacToe.game_win(self)
+        else:
+            self.game_finished = 0  # all fields are full
+            TicTacToe.game_win(self)
+
+    def rules(self):
+        if ((self.win == 0) and (self.game_finished == 0)) is True:
+            print('Draw')
+            exit()
+        elif self.win == 1:
+            print(self.result)
+            exit()
+
+    def game_win(self):
+    # horizontal rows
+        if all((self.rows[1] == self.rows[0], self.rows[2] == self.rows[0], self.rows[0] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[0]} wins'
+        if all((self.rows[4] == self.rows[3], self.rows[5] == self.rows[3], self.rows[3] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[3]} wins'
+        if all((self.rows[7] == self.rows[6], self.rows[8] == self.rows[6], self.rows[6] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[6]} wins'
+    # vertical columns
+        if all((self.rows[3] == self.rows[0], self.rows[6] == self.rows[0], self.rows[0] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[0]} wins'
+        if all((self.rows[1] == self.rows[4], self.rows[1] == self.rows[7], self.rows[1] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[1]} wins'
+        if all((self.rows[5] == self.rows[2], self.rows[8] == self.rows[5], self.rows[2] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[2]} wins'
+    # diagonals
+        if all((self.rows[4] == self.rows[0], self.rows[8] == self.rows[0], self.rows[0] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[0]} wins'
+        if all((self.rows[4] == self.rows[2], self.rows[6] == self.rows[2], self.rows[2] not in self.empty)) is True:
+            self.win += 1
+            self.result = f'{self.rows[2]} wins'
+        TicTacToe.rules(self)
+
+
+game = TicTacToe()
