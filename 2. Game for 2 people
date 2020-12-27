@@ -107,8 +107,6 @@ class TicTacToe:
         elif self.again == 'N':
             print('Goodbye!')
             exit()
-        else:
-            TicTacToe.rules(self)
 
     def game_win(self):
     # horizontal rows
