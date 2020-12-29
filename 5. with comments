@@ -11,8 +11,11 @@ class TicTacToe:
           '(To play 3 parameters are needed!) or "exit"\nGood luck!')
 
     def __init__(self):
-        self.empty = [' ', '_']
-        TicTacToe.enter_data(self)
+        TicTacToe.menu(self)
+        self.win = 0
+        self.game_finished = 0
+        self.matrix = [[' ' for i in range(3)] for j in range(3)]
+        self.player_sign = 'X'
 
     def matrix_reset(self):
         """
@@ -20,35 +23,20 @@ class TicTacToe:
 
         sets:
             0 win status - self.win = 0
-            empty matrix 3x3 - self.cells
+            empty matrix 3x3 - self.matrix
             prints a blank matrix - TicTacToe.grid_printing(self)
         next:
             creates an empty matrix diagram with frames: TicTacToe.grid_printing(self)
         """
-        self.cells_value = '_________'
-        self.rows = []
         self.player_sign = 'X'
-        self.matrix = ['11', '12', '13', '21', '22', '23', '31', '32', '33']
-        for x in self.cells_value:  # replaced with a space
-            if x == '_':
-                self.rows.append(' ')
-            else:
-                self.rows.append(x)
-        self.cells = dict.fromkeys(self.matrix)
-        self.cells = {'11': self.rows[0], '12': self.rows[1], '13': self.rows[2],
-                      '21': self.rows[3], '22': self.rows[4], '23': self.rows[5],
-                      '31': self.rows[6], '32': self.rows[7], '33': self.rows[8]}
+        self.matrix = [[' ' for i in range(3)] for j in range(3)]
         self.win = 0
         self.game_finished = 0
-        self.gamer_move = []
         TicTacToe.grid_printing(self)
 
     def player(self):
         """
         Determines whether players 1 and 2 are computer or a player.
-
-        next:
-            transfers the program to the motion execution function: TicTacToe.player_move(self)
         """
         if self.player1 == "user":
             self.game_type1 = 'player'
@@ -58,84 +46,6 @@ class TicTacToe:
             self.game_type2 = 'player'
         else:
             self.game_type2 = 'computer'
-        TicTacToe.player_move(self)
-
-    def player_game(self):
-        """
-        Analyzes the coordinates entered by the player - whether they are correct - and introduces them to the matrix.
-
-        returns:
-            matrix with printed player movement: print(TicTacToe.grid_printing(self))
-            False - to end the WHILE loop to validate the coordinates entered by the user
-            matrix for the AI decreases by selected cell: self.matrix.remove(x)
-        next:
-            if the coordinates are incorrectly entered - repeat entered
-            after printing the matrix with the approved move: print(TicTacToe.grid_printing(self))
-            change of the X / O sign: TicTacToe.change_sign(self)
-            next player's move: TicTacToe.player_move(self)
-        """
-        while True:
-            self.gamer_move = input(f'Enter the coordinates: ')
-            self.gamer_move = [x for x in self.gamer_move]
-            delete = [' ', ',', ';']
-            letter = True
-            coordinate = True
-            for x in self.gamer_move:
-                if x in delete:  # if ' ' ',' ';' between the coordinates, delete it
-                    self.gamer_move.remove(x)
-            for x in self.gamer_move:
-                if x.isalpha() is True:  # if letter - False and repeat input
-                    letter = False
-                elif 1 > int(x) or 3 < int(x):  # if coordinates are different than range 1-3  - False and repeat input
-                    coordinate = False
-            if letter is False:
-                print('You should enter numbers!')
-            elif coordinate is False:
-                print('Coordinates should be from 1 to 3!')
-            else:
-                self.gamer_move = ''.join(self.gamer_move)  # change to str
-                cell_status = self.cells[self.gamer_move]
-                if (cell_status == 'X') or (cell_status == 'O'):
-                    print('This cell is occupied! Choose another one!')
-                else:
-                    self.cells[self.gamer_move] = self.player_sign
-                    print(TicTacToe.grid_printing(self))
-                    for x in self.matrix:  # removing occupied cells from the AI free list
-                        if x == self.gamer_move:
-                            self.matrix.remove(x)
-                    TicTacToe.change_sign(self)
-                    TicTacToe.player_move(self)
-                    return False
-
-    def ai_game_easy(self):
-        """
-        Easy computer game level randomly selects an empty cell in the matrix.
-
-        returns:
-            matrix with printed AI movement: print(TicTacToe.grid_printing(self))
-            matrix for the AI decreases by selected cell: self.matrix.remove(x)
-            False - to end the WHILE loop to validate cell selection by the AI
-        next:
-            if randomly selected cell is full - repeat the draw from the AI matrix
-            after printing the matrix with the approved move: print(TicTacToe.grid_printing(self))
-            change of the X / O sign: TicTacToe.change_sign(self)
-            next player's move: TicTacToe.player_move(self)
-        """
-        while True:
-            computer_choice = random.choice(self.matrix)
-            cell_status = self.cells[computer_choice]
-            if cell_status == 'X' or cell_status == 'O':  # double check that the drawn cell is free
-                TicTacToe.ai_game_easy(self)
-            else:
-                print('Making move level "easy"')
-                self.cells[computer_choice] = self.player_sign
-                print(TicTacToe.grid_printing(self))
-                for x in self.matrix:  # removing occupied cells from the AI free list
-                    if x == computer_choice:
-                        self.matrix.remove(x)
-                TicTacToe.change_sign(self)
-                TicTacToe.player_move(self)
-                return False
 
     def player_move(self):
         """
@@ -145,7 +55,6 @@ class TicTacToe:
             if the player is a computer: TicTacToe.ai_game_easy(self)
             if the player is a user: TicTacToe.player_game(self)
         """
-        TicTacToe.is_game_finished(self)
         while self.win == 0:
             if self.player_sign == 'X':
                 if self.game_type1 == 'player':
@@ -158,10 +67,140 @@ class TicTacToe:
                 if self.game_type2 == 'computer':
                     TicTacToe.ai_game_easy(self)
 
+    def is_game_finished(self):
+        """
+        Checks if there are still free fields/cells in the matrix.
+
+        returns:
+            status of cells in the matrix: self.game_finished = 0/1
+        next:
+            if empty fields - sends back to check if someone has won: TicTacToe.game_win(self)
+            if full fields - sends back to check if someone has won: TicTacToe.game_win(self)
+        """
+        empty_cells = 0
+        for x in range(0, 3):
+            for y in range(0, 3):
+                empty_cells += self.matrix[x][y].count(' ')
+        if empty_cells > 0:
+            self.game_finished = 1  # there are empty cells
+            TicTacToe.game_win(self)
+        else:
+            self.game_finished = 0  # all fields are full
+            TicTacToe.game_win(self)
+
+    def game_win(self):
+        """
+        Called after each move - checks to see if any of the players have won.
+
+        returns:
+            game win result: self.result
+        next:
+            sends to check the rules of the game: TicTacToe.rules(self)
+        """
+    # horizontal rows
+        for i in range(3):
+            if self.matrix[i].count(self.player_sign) == 3:
+                self.win += 1
+                self.result = f'{self.player_sign} wins\n'
+    # vertical columns
+        for i in range(3):
+            if self.matrix[0][i] == self.matrix[1][i] == self.matrix[2][i] == self.player_sign:
+                self.win += 1
+                self.result = f'{self.player_sign} wins\n'
+    # diagonals
+        if self.matrix[0][0] == self.matrix[1][1] == self.matrix[2][2] == self.player_sign:
+            self.win += 1
+            self.result = f'{self.player_sign} wins\n'
+        if self.matrix[2][0] == self.matrix[1][1] == self.matrix[0][2] == self.player_sign:
+            self.win += 1
+            self.result = f'{self.player_sign} wins\n'
+        TicTacToe.rules(self)
+
+    def rules(self):
+        """
+        Checks after each movement: the end of the game (win) or a draw.
+
+        returns:
+            Prints the game result: Win or Draw
+        next:
+            directs to enter data for a new game: TicTacToe.menu(self)
+        """
+        if ((self.win == 0) and (self.game_finished == 0)) is True:
+            print('Draw\n')
+            TicTacToe.menu(self)
+        elif self.win == 1 or self.win == 2:
+            print(self.result)
+            TicTacToe.menu(self)
+
+    def ai_game_easy(self):
+        """
+        Easy computer game level randomly selects an empty cell in the matrix.
+
+        returns:
+            matrix with printed AI movement: print(TicTacToe.grid_printing(self))
+            False - to end the WHILE loop to validate cell selection by the AI
+        next:
+            if randomly selected cell is full - repeat the draw from the AI matrix
+            after printing the matrix with the approved move: print(TicTacToe.grid_printing(self))
+            change of the X / O sign: TicTacToe.change_sign(self)
+            next player's move: TicTacToe.player_move(self)
+        """
+        while True:
+            y = random.randrange(3)
+            x = random.randrange(3)
+            cell_status = self.matrix[x][y]
+            if cell_status == 'X' or cell_status == 'O':  # double check that the drawn cell is free
+                TicTacToe.ai_game_easy(self)
+            else:
+                print('Making move level "easy"')
+                self.matrix[x][y] = self.player_sign
+                print(TicTacToe.grid_printing(self))
+                TicTacToe.change_sign(self)
+                TicTacToe.player_move(self)
+                return False
+
+    def player_game(self):
+        """
+        Analyzes the coordinates entered by the player - whether they are correct - and introduces them to the matrix.
+
+        returns:
+            matrix with printed player movement: print(TicTacToe.grid_printing(self))
+            False - to end the WHILE loop to validate the coordinates entered by the user
+        next:
+            if the coordinates are incorrectly entered - repeat entered
+            after printing the matrix with the approved move: print(TicTacToe.grid_printing(self))
+            change of the X / O sign: TicTacToe.change_sign(self)
+            next player's move: TicTacToe.player_move(self)
+        """
+        while True:
+            gamer_move = [x for x in input(f'Enter the coordinates: ')]
+            delete = [' ', ',', ';']
+            for x in gamer_move:
+                if x in delete:  # if ' ' ',' ';' between the coordinates, delete it
+                    gamer_move.remove(x)
+            for x in gamer_move:
+                if x.isalpha() is True:  # if letter - False and repeat input
+                    print('You should enter numbers!')
+                    return False
+                elif 1 > int(x) or 3 < int(x):  # if coordinates are different than range 1-3  - False and repeat input
+                    print('Coordinates should be from 1 to 3!')
+                    return False
+            x = int(gamer_move[0]) - 1
+            y = int(gamer_move[1]) - 1
+            if (self.matrix[x][y] == 'X') or (self.matrix[x][y] == 'O'):
+                print('This cell is occupied! Choose another one!')
+            else:
+                self.matrix[x][y] = self.player_sign
+                print(TicTacToe.grid_printing(self))
+                TicTacToe.change_sign(self)
+                TicTacToe.player_move(self)
+                return False
+
     def change_sign(self):
         """
         After making a move it changes the X / O sign between players.
         """
+        TicTacToe.is_game_finished(self)
         if self.player_sign == 'X':
             self.player_sign = 'O'
         elif self.player_sign == 'O':
@@ -174,89 +213,11 @@ class TicTacToe:
         returns:
             matrix (empty or filled) to be printed - with a frame
         """
-        self.rows[0] = self.cells['11']
-        self.rows[1] = self.cells['12']
-        self.rows[2] = self.cells['13']
-        self.rows[3] = self.cells['21']
-        self.rows[4] = self.cells['22']
-        self.rows[5] = self.cells['23']
-        self.rows[6] = self.cells['31']
-        self.rows[7] = self.cells['32']
-        self.rows[8] = self.cells['33']
-        return f"---------\n| {self.cells['11']} {self.cells['12']} {self.cells['13']} |" \
-               f"\n| {self.cells['21']} {self.cells['22']} {self.cells['23']} |" \
-               f"\n| {self.cells['31']} {self.cells['32']} {self.cells['33']} |\n---------"
-
-    def is_game_finished(self):
-        """
-        Checks if there are still free fields/cells in the matrix.
-
-        returns:
-            status of cells in the matrix: self.game_finished = 0/1
-        next:
-            if empty fields - sends back to check if someone has won: TicTacToe.game_win(self)
-            if full fields - sends back to check if someone has won: TicTacToe.game_win(self)
-        """
-        if (self.empty[0] in self.rows) or (self.empty[1] in self.rows):
-            self.game_finished = 1  # there are empty cells
-            TicTacToe.game_win(self)
-        else:
-            self.game_finished = 0  # all fields are full
-            TicTacToe.game_win(self)
-
-    def rules(self):
-        """
-        Checks after each movement: the end of the game (win) or a draw.
-
-        returns:
-            Prints the game result: Win or Draw
-        next:
-            directs to enter data for a new game: TicTacToe.enter_data(self)
-        """
-        if ((self.win == 0) and (self.game_finished == 0)) is True:
-            print('Draw\n')
-            TicTacToe.enter_data(self)
-        elif self.win == 1 or self.win == 2:
-            print(self.result)
-            TicTacToe.enter_data(self)
-
-    def game_win(self):
-        """
-        Called after each move - checks to see if any of the players have won.
-
-        returns:
-            game win result: self.result
-        next:
-            sends to check the rules of the game: TicTacToe.rules(self)
-        """
-    # horizontal rows
-        if all((self.rows[1] == self.rows[0], self.rows[2] == self.rows[0], self.rows[0] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[0]} wins\n'
-        if all((self.rows[4] == self.rows[3], self.rows[5] == self.rows[3], self.rows[3] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[3]} wins\n'
-        if all((self.rows[7] == self.rows[6], self.rows[8] == self.rows[6], self.rows[6] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[6]} wins\n'
-    # vertical columns
-        if all((self.rows[3] == self.rows[0], self.rows[6] == self.rows[0], self.rows[0] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[0]} wins\n'
-        if all((self.rows[1] == self.rows[4], self.rows[1] == self.rows[7], self.rows[1] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[1]} wins\n'
-        if all((self.rows[5] == self.rows[2], self.rows[8] == self.rows[5], self.rows[2] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[2]} wins\n'
-    # diagonals
-        if all((self.rows[4] == self.rows[0], self.rows[8] == self.rows[0], self.rows[0] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[0]} wins\n'
-        if all((self.rows[4] == self.rows[2], self.rows[6] == self.rows[2], self.rows[2] not in self.empty)) is True:
-            self.win += 1
-            self.result = f'{self.rows[2]} wins\n'
-        TicTacToe.rules(self)
+        grid = "---------\n"
+        for i in range(3):
+            grid += "| " + " ".join(self.matrix[i]) + " |\n"
+        grid += "---------"
+        return grid
 
     def menu(self):
         """
@@ -268,31 +229,20 @@ class TicTacToe:
             game matrix printing: print(TicTacToe.grid_printing(self))
             refers to defining the type of players (AI or user): TicTacToe.player(self)
         """
-        command1 = self.game[0]
-        game_players = self.game[1:]
-        if (len(game_players) == 2) and ('exit' not in game_players):
+        game = tuple(input('Input command: ').split())
+        if (len(game[1:]) == 2) and ('exit' not in game[1:]):
             print('Hello!')
             TicTacToe.matrix_reset(self)
-            self.player1 = game_players[0]
-            self.player2 = game_players[1]
+            self.player1 = game[1:][0]
+            self.player2 = game[1:][1]
             print(TicTacToe.grid_printing(self))
             TicTacToe.player(self)
-        elif command1 == 'exit':
+            TicTacToe.player_move(self)
+        elif game[0] == 'exit':
             print('Bye!')
             exit()
         else:
             print('Bad parameters!')
-            TicTacToe.enter_data(self)
-
-    def enter_data(self):
-        """
-        Introduces the type of game dictated by the player.
-
-        next:
-            analysis of the entered data: TicTacToe.menu(self)
-        """
-        self.game = tuple(input('Input command: ').split())
-        TicTacToe.menu(self)
-
+            TicTacToe.menu(self)
 
 game = TicTacToe()
