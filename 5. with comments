@@ -37,8 +37,6 @@ class TicTacToe:
         self.player_sign = 'X'
         self.opponent = 'O'
         self.matrix = [[' ' for i in range(3)] for j in range(3)]
-        self.diagonal2 = [self.matrix[2][0], self.matrix[1][1], self.matrix[0][2]]
-        self.diagonal1 = [self.matrix[0][0], self.matrix[1][1], self.matrix[2][2]]
         self.win = 0
         self.game_finished = 0
         TicTacToe.grid_printing(self)
@@ -128,12 +126,10 @@ class TicTacToe:
                 self.win += 1
                 self.result = f'{self.player_sign} wins\n'
     # diagonals
-        #if self.diagonal2.count(self.player_sign) == 3:
         if [self.matrix[2][0], self.matrix[1][1], self.matrix[0][2]].count(self.player_sign) == 3:
             self.win += 1
             self.result = f'{self.player_sign} wins\n'
-        #if self.diagonal1.count(self.player_sign) == 3:
-        if [self.matrix[2][0], self.matrix[1][1], self.matrix[0][2]].count(self.player_sign) == 3:
+        if [self.matrix[0][0], self.matrix[1][1], self.matrix[2][2]].count(self.player_sign) == 3:
             self.win += 1
             self.result = f'{self.player_sign} wins\n'
         TicTacToe.rules(self)
@@ -176,9 +172,7 @@ class TicTacToe:
             else:
                 print('Making move - level "easy"')
                 self.matrix[x][y] = self.player_sign
-                print(TicTacToe.grid_printing(self))
-                TicTacToe.change_sign(self)
-                TicTacToe.player_move(self)
+                TicTacToe.__str__(self)
                 return False
 
     def ai_game_medium(self):
@@ -203,7 +197,7 @@ class TicTacToe:
             counter = 0
             # horizontal rows - check if 2 filled by AI and 3 is available:
             for i in range(3):
-                columns = [self.matrix[0][i], self.matrix[1][i], self.matrix[2][i]]
+
                 if (self.matrix[i].count(self.player_sign) == 2) and (' ' in self.matrix[i]):
                     free_cell = self.matrix[i].index(' ')
                     self.matrix[i][free_cell] = self.player_sign
@@ -220,27 +214,34 @@ class TicTacToe:
                     TicTacToe.__str__(self)
             # vertical columns - check if 2 filled by opponent and 3 is available:
             for i in range(3):
-                if columns.count(self.opponent) == 2 and (' ' in columns):
-                    for cell in columns:
+                if [self.matrix[0][i], self.matrix[1][i], self.matrix[2][i]].count(self.opponent) == 2 \
+                        and (' ' in [self.matrix[0][i], self.matrix[1][i], self.matrix[2][i]]):
+                    for cell in [self.matrix[0][i], self.matrix[1][i], self.matrix[2][i]]:
                         if cell == ' ':
-                            saving_cell = columns.index(cell)
+                            saving_cell = [self.matrix[0][i], self.matrix[1][i], self.matrix[2][i]].index(cell)
                             self.matrix[saving_cell][i] = self.player_sign
                             counter += 1
                             print('Making move - level "medium"')
                             TicTacToe.__str__(self)
             # diagonals - check if 2 filled by opponent and 3 is available:
             for i in range(3):
-                if (self.matrix[i][i] == ' ') and (self.matrix[i][i] in self.diagonal2) and (self.diagonal2.count(self.opponent) == 2):
+                if (self.matrix[i][i] == ' ') and (self.matrix[i][i] in
+                                                   [self.matrix[2][0], self.matrix[1][1], self.matrix[0][2]]) and \
+                        ([self.matrix[2][0], self.matrix[1][1], self.matrix[0][2]].count(self.opponent) == 2):
                     for j in range(3):
-                        if (self.matrix[j][-(j + 1)] == ' ') and (self.matrix[j][-(j + 1)] in self.diagonal2):
+                        if (self.matrix[j][-(j + 1)] == ' ') and \
+                                (self.matrix[j][-(j + 1)] in [self.matrix[2][0], self.matrix[1][1], self.matrix[0][2]]):
                             self.matrix[j][-(j + 1)] = self.player_sign
                             counter += 1
                             print('Making move - level "medium"')
                             TicTacToe.__str__(self)
             for i in range(3):
-                if (self.matrix[i][i] == ' ') and (self.matrix[i][i] in self.diagonal1) and (self.diagonal1.count(self.opponent) == 2):
+                if (self.matrix[i][i] == ' ') and (self.matrix[i][i] in
+                                                   [self.matrix[0][0], self.matrix[1][1], self.matrix[2][2]]) and \
+                        ([self.matrix[0][0], self.matrix[1][1], self.matrix[2][2]].count(self.opponent) == 2):
                     for j in range(3):
-                        if (self.matrix[j][-(j + 1)] == ' ') and (self.matrix[j][-(j + 1)] in self.diagonal1):
+                        if (self.matrix[j][-(j + 1)] == ' ') and\
+                                (self.matrix[j][-(j + 1)] in [self.matrix[0][0], self.matrix[1][1], self.matrix[2][2]]):
                             self.matrix[j][-(j + 1)] = self.player_sign
                             counter += 1
                             print('Making move - level "medium"')
